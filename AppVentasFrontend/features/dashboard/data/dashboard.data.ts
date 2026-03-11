@@ -1,0 +1,73 @@
+"use client";
+
+import { Product } from "../types/dashboard.types";
+import { dashboardTheme as t } from "../theme/dashboard.theme";
+
+export const PRODUCTS_DATA: Product[] = [
+  {
+    id: "PRD-001",
+    name: 'Laptop Pro 15"',
+    category: "Electrónica",
+    stock: 24,
+    stockStatus: "ok",
+    price: "$1,299.00",
+    invoice: "FAC-2024-0891",
+    invoiceStatus: "pagada",
+    date: "15 Ene 2025",
+  },
+  {
+    id: "PRD-002",
+    name: "Monitor 4K UltraWide",
+    category: "Electrónica",
+    stock: 6,
+    stockStatus: "bajo",
+    price: "$549.00",
+    invoice: "FAC-2024-0892",
+    invoiceStatus: "pendiente",
+    date: "16 Ene 2025",
+  },
+  {
+    id: "PRD-003",
+    name: "Teclado Mecánico RGB",
+    category: "Periféricos",
+    stock: 0,
+    stockStatus: "agotado",
+    price: "$189.00",
+    invoice: "FAC-2024-0893",
+    invoiceStatus: "vencida",
+    date: "10 Ene 2025",
+  },
+  {
+    id: "PRD-004",
+    name: "Silla Ergonómica Plus",
+    category: "Mobiliario",
+    stock: 12,
+    stockStatus: "ok",
+    price: "$399.00",
+    invoice: "FAC-2024-0894",
+    invoiceStatus: "pagada",
+    date: "17 Ene 2025",
+  },
+  {
+    id: "PRD-005",
+    name: "Auriculares Noise Cancel",
+    category: "Audio",
+    stock: 3,
+    stockStatus: "bajo",
+    price: "$299.00",
+    invoice: "FAC-2024-0895",
+    invoiceStatus: "pendiente",
+    date: "18 Ene 2025",
+  },
+  {
+    id: "PRD-006",
+    name: "Webcam HD 1080p",
+    category: "Periféricos",
+    stock: 31,
+    stockStatus: "ok",
+    price: "$129.00",
+    invoice: "FAC-2024-0896",
+    invoiceStatus: "pagada",
+    date: "18 Ene 2025",
+  },
+];

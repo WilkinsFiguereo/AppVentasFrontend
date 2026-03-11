@@ -1,0 +1,1 @@
+export { dashboardTheme as reportesTheme, globalStyles } from "../../dashboard/theme/dashboard.theme";

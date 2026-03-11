@@ -1,0 +1,1 @@
+export { dashboardTheme as facturasTheme, globalStyles } from "../../dashboard/theme/dashboard.theme";
