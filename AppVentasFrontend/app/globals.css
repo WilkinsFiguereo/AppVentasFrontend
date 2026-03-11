@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+/* app/globals.css */
+:root {
+  /* Brand (tu paleta) */
+  --color-primary: #1e3a8a;
+  --color-secondary: #3b82f6;
+  --color-accent: #60a5fa;
+
+  /* Base */
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-text: #0f172a;
+  --color-sub: #64748b;
+  --color-border: #e2e8f0;
+
+  /* States */
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+
+  /* Helpers */
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 28px rgba(15, 23, 42, 0.09);
+  --shadow-hero: 0 4px 32px rgba(15, 23, 42, 0.1);
+
+  --container: 1200px;
+  --pad-x: 32px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    "Liberation Sans", sans-serif;
+}
+
+.main-wrapper {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 32px var(--pad-x) 48px;
+}
+
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+/* 
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #3a3a3a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+} */
+
