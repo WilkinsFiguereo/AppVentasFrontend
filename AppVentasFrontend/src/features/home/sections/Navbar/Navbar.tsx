@@ -156,7 +156,7 @@ export default function Navbar({ cart }: { cart: number }) {
         <nav style={{ display: "flex", gap: 2, marginLeft: 8 }}>
           <NavLink href="/navigation/home">Inicio</NavLink>
           <NavLink href="/navigation/search">Productos</NavLink>
-          <NavLink href="/navigation/offers">Ofertas</NavLink>
+          <NavLink href="/navigation/services">Servicios</NavLink>
         </nav>
 
         {/* SEARCH */}
@@ -269,7 +269,7 @@ export default function Navbar({ cart }: { cart: number }) {
                 }}
                 onClick={() => {
                   setMenuOpen(false);
-                  router.push("/navigation/orders");
+                  router.push("/navigation/my-orders");
                 }}
               >
                 Mis pedidos
