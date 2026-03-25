@@ -136,7 +136,12 @@ type ServicesSectionProps = {
 export default function ServicesSection({ services, loading = false, error = null }: ServicesSectionProps) {
   return (
     <section>
-      <SectionHeading label="Servicios" title="Acompanamiento y soporte" showAll />
+      <SectionHeading
+        label="Servicios"
+        title="Acompanamiento y soporte"
+        showAll
+        showAllHref="http://localhost:3000/navigation/search"
+      />
 
       {error && !loading ? (
         <p style={{ marginBottom: 12, color: "#B91C1C", fontSize: 13, fontWeight: 600 }}>{error}</p>

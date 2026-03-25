@@ -7,7 +7,6 @@ import Navbar from "./sections/Navbar/Navbar";
 import HeroSlider from "./sections/Hero/HeroSlider";
 import ProductsSection from "./sections/Products/ProductsSection";
 import BestSellersSection from "./sections/BestSellers/BestSellersSection";
-import OffersSection from "./sections/Offers/OffersSection";
 import ServicesSection from "./sections/Services/ServicesSection";
 import Footer from "./sections/Footer/Footer";
 
@@ -54,8 +53,6 @@ function getCartCount() {
 
 function mapApiProductToHomeProduct(item: ApiProductItem, index: number): Product {
   const price = Number(item.list_price ?? 0);
-  const oldPrice = Number(item.standard_price ?? 0);
-  const hasOffer = oldPrice > price;
 
   return {
     id: item.id,
@@ -63,10 +60,9 @@ function mapApiProductToHomeProduct(item: ApiProductItem, index: number): Produc
     cat: (item.default_code || "General").trim() || "General",
     img: `https://picsum.photos/seed/product-${item.id}/600/420`,
     price,
-    old: hasOffer ? oldPrice : null,
     rating: Number((4.4 + (index % 6) * 0.1).toFixed(1)),
     reviews: 120 + index * 37,
-    badge: hasOffer ? "Oferta" : index < 4 ? "Mas vendido" : null,
+    badge: index < 4 ? "Mas vendido" : null,
   };
 }
 
@@ -121,7 +117,7 @@ export default function HomePage() {
           headers.Authorization = `Bearer ${token}`;
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/product/list?limit=8&offset=0`, {
+        const response = await fetch(`${API_BASE_URL}/api/product/all_list?limit=8&offset=0`, {
           method: "GET",
           headers,
           cache: "no-store",
@@ -156,7 +152,7 @@ export default function HomePage() {
       setServicesError(null);
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/product/list?type=service&limit=8&offset=0`, {
+        const response = await fetch(`${API_BASE_URL}/api/product/all_list?type=service&limit=8&offset=0`, {
           method: "GET",
           cache: "no-store",
         });
@@ -233,9 +229,7 @@ export default function HomePage() {
 
         <BestSellersSection products={bestSellers} />
 
-        <OffersSection products={products} />
-
-        <Footer />
+       <Footer />
       </main>
     </>
   );

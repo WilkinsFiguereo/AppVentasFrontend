@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRegister } from "../hooks/useRegister";
 import { AuthCard } from "../ui/AuthCard";
 import { InputField, SubmitButton, ErrorBanner, CheckboxField } from "../ui/AuthFields";
@@ -28,6 +29,7 @@ const REGISTER_BRANDING = {
 };
 
 export function RegisterSection() {
+  const router = useRouter();
   const { form, errors, authState, handleChange, handleSubmit } = useRegister();
 
   return (
@@ -95,6 +97,13 @@ export function RegisterSection() {
         </CheckboxField>
 
         <SubmitButton label="Crear cuenta" isLoading={authState.isLoading} />
+        <button
+          type="button"
+          className="auth-btn-secondary"
+          onClick={() => router.push("/navigation/home")}
+        >
+          Volver al inicio
+        </button>
       </form>
     </AuthCard>
   );

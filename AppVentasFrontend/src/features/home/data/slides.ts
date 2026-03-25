@@ -24,72 +24,87 @@ const FALLBACK_IMAGES = [
   "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1400&q=80&fit=crop",
 ];
 
-export const SLIDES: Slide[] = [
+export const SLIDES_FALLBACK: Slide[] = [
   {
-    id: 1,
+    id: 0,
     img: FALLBACK_IMAGES[0],
-    eyebrow: "Nuevo lanzamiento",
-    title: "Analitica Empresarial\nen tiempo real",
-    body: "Toma decisiones basadas en datos con paneles configurables y reportes automatizados.",
-    cta: "Ver producto",
-    ctaSecondary: "Demo gratuita",
-  },
-  {
-    id: 2,
-    img: FALLBACK_IMAGES[1],
-    eyebrow: "Oferta Enterprise",
-    title: "ERP Completo\npara tu organizacion",
-    body: "Finanzas, logistica, RRHH y ventas integrados. Hasta 40 % de descuento en licencias anuales.",
-    cta: "Explorar planes",
-    ctaSecondary: "Hablar con ventas",
-  },
-  {
-    id: 3,
-    img: FALLBACK_IMAGES[2],
-    eyebrow: "Colaboracion remota",
-    title: "Tu equipo sincronizado\ndonde sea que este",
-    body: "Gestion de proyectos, comunicacion y seguimiento de tareas en una sola plataforma.",
-    cta: "Comenzar gratis",
-    ctaSecondary: "Ver caracteristicas",
-  },
-  {
-    id: 4,
-    img: FALLBACK_IMAGES[3],
-    eyebrow: "Infraestructura Cloud",
-    title: "Escala sin limites\ncon nuestra nube",
-    body: "Servidores dedicados, backups automaticos y 99.9 % de uptime garantizado por contrato.",
-    cta: "Ver servidores",
-    ctaSecondary: "Calcular costo",
+    eyebrow: "Cargando...",
+    title: "Cargando anuncios",
+    body: "Espera un momento",
+    cta: "",
+    ctaSecondary: "",
   },
 ];
 
+/* ────────────────────────────────────────────────
+   Mapper
+──────────────────────────────────────────────── */
 function mapAdToSlide(item: ApiAdItem, index: number): Slide {
-  const title = (item.name || "Promocion").trim();
-  const body = (item.description || "Descubre nuestras ultimas ofertas").trim();
-
   return {
     id: item.id,
     img: item.image || FALLBACK_IMAGES[index % FALLBACK_IMAGES.length],
     eyebrow: "Anuncio",
-    title,
-    body,
+    title: item.name || "Promocion",
+    body: item.description || "",
     cta: "Ver mas",
     ctaSecondary: "Contactar",
   };
 }
 
-export async function fetchSlidesFromApi(limit = 10): Promise<Slide[]> {
-  const response = await fetch(`${API_BASE_URL}/api/ads/list?limit=${limit}&offset=0`, {
+/* ────────────────────────────────────────────────
+   FETCH REAL (DEBUG)
+──────────────────────────────────────────────── */
+export async function fetchSlidesFromApi(): Promise<Slide[]> {
+  const url = `${API_BASE_URL}/api/ads/list?limit=10&offset=0`;
+
+  console.log("🔥 Fetching ads from:", url);
+
+  const res = await fetch(url, {
     method: "GET",
     cache: "no-store",
   });
 
-  const body = (await response.json()) as ApiAdResponse;
+  const json = await res.json();
 
-  if (!response.ok || !body.success) {
-    throw new Error(body.message || `Error al cargar anuncios (${response.status})`);
+  console.log("📦 API RESPONSE:", json);
+
+  if (!res.ok) {
+    throw new Error("HTTP ERROR");
   }
 
-  const items = Array.isArray(body.data?.items) ? body.data.items : [];
+  if (!json.success) {
+    throw new Error("API respondió success=false");
+  }
+
+  const items = json.data?.items || [];
+
+  if (!items.length) {
+    console.warn("⚠️ No hay anuncios en Odoo");
+  }
+
   return items.map(mapAdToSlide);
+}
+
+/* ────────────────────────────────────────────────
+   LOADER REAL
+──────────────────────────────────────────────── */
+export async function getSlides(): Promise<Slide[]> {
+  try {
+    const slides = await fetchSlidesFromApi();
+
+    // ✅ AQUÍ ESTÁ LO IMPORTANTE
+    // Si hay datos → SIEMPRE usar API
+    if (slides.length > 0) {
+      return slides;
+    }
+
+    // Solo fallback si NO hay nada
+    return SLIDES_FALLBACK;
+
+  } catch (error) {
+    console.error("❌ ERROR API:", error);
+
+    // fallback SOLO si rompe
+    return SLIDES_FALLBACK;
+  }
 }

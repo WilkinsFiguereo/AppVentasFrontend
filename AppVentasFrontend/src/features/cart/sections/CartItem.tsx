@@ -74,7 +74,7 @@ export function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", paddingTop: 8, borderTop: `1px solid ${tokens.border}` }}>
           <span style={{ fontSize: 12, color: tokens.sub, fontFamily: "'Sora',sans-serif" }}>
-            ${item.price}/usuario/mes x {quantity} x {users} usuarios
+            ${item.price}x {quantity} x {users} usuarios
             {item.billingCycle === "annual" && " x 12 meses"}
           </span>
           <span style={{ fontSize: 18, fontWeight: 800, color: tokens.text, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.4px" }}>

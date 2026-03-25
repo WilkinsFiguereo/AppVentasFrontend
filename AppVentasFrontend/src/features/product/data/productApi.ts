@@ -24,6 +24,26 @@ async function checkResponse<T>(res: Response): Promise<T> {
   return json.data ?? json;
 }
 
+function isServiceItem(item: any) {
+  const typeValue = (
+    item.type ??
+    item.product_type ??
+    item.type_id?.model ??
+    item.product_tmpl_id?.type ??
+    ""
+  )
+    .toString()
+    .toLowerCase();
+
+  const categoryValue = (item.categ_id?.name ?? item.category ?? "").toString().toLowerCase();
+
+  if (typeValue === "service" || typeValue === "servicio") return true;
+
+  if (categoryValue.includes("servicio") || categoryValue.includes("service")) return true;
+
+  return false;
+}
+
 // ───────────────────────────
 // API helpers for productos
 // ───────────────────────────
@@ -34,15 +54,28 @@ export async function apiListProductos(): Promise<Producto[]> {
   });
 
   const data = await checkResponse<any>(res);
+  const items = Array.isArray(data.items) ? data.items : [];
 
-  return data.items.map((p: any) => {
+  return items
+    .filter((p) => !isServiceItem(p))
+    .map((p: any) => {
     const stock = p.quantity_on_hand ?? p.stock ?? 0;
+    const typeField = (
+      p.type ??
+      p.product_type ??
+      p.type_id?.model ??
+      p.product_tmpl_id?.type ??
+      ""
+    )
+      .toString()
+      .toLowerCase();
 
     return {
       id: String(p.id),
       nombre: p.name ?? "",
       sku: p.default_code ?? "",
       categoria: (p.categ_id?.name ?? "Electrónica"),
+      type: typeField,
       stock,
       stockStatus: stock === 0 ? "agotado" : stock < 5 ? "bajo" : "ok",
       precio: p.list_price ?? 0,

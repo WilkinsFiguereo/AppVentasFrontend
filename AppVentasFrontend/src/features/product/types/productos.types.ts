@@ -13,6 +13,7 @@ export interface Producto {
   nombre: string;
   sku: string;
   categoria: ProductCategory;
+  type?: string;
   stock: number;
   stockStatus: StockStatus;
   precio: number;

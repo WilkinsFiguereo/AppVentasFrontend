@@ -9,7 +9,12 @@ export default function BestSellersSection({ products }: { products: Product[] }
   return (
     <section>
       <br />
-      <SectionHeading label="Top" title="Mas vendidos" showAll />
+      <SectionHeading
+        label="Top"
+        title="Mas vendidos"
+        showAll
+        showAllHref="http://localhost:3000/navigation/search"
+      />
       <div
         style={{
           display: "grid",

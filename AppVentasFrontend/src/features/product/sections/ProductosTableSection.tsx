@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Search, LayoutGrid, LayoutList,
   ArrowUpDown, ArrowUp, ArrowDown,
@@ -300,6 +300,16 @@ export function ProductosTableSection({
   onSearchChange, onCategoriaChange, onVistaModeChange,
   onToggleOrden, onView, onEdit, onDelete,
 }: ProductosTableSectionProps) {
+  const cleanProductos = useMemo(() => {
+    return productos.filter((p) => {
+      const type = (p.type ?? "").toLowerCase();
+      const categoria = (p.categoria ?? "").toLowerCase();
+      const isServiceType = type.includes("service") || type.includes("servicio");
+      const isServiceCategory = categoria.includes("servicio") || categoria.includes("service");
+      return !isServiceType && !isServiceCategory;
+    });
+  }, [productos]);
+
   return (
     <div style={{
       background: "white", borderRadius: 16,
@@ -315,9 +325,9 @@ export function ProductosTableSection({
         {/* Filtros de categoría */}
         <div style={{ display: "flex", gap: 6 }}>
           {React.useMemo(() => {
-            const cats = ["Todas", ...new Set(productos.map((p) => p.categoria))];
+            const cats = ["Todas", ...new Set(cleanProductos.map((p) => p.categoria))];
             return cats;
-          }, [productos]).map((cat) => (
+          }, [cleanProductos]).map((cat) => (
             <button
               key={cat}
               onClick={() => onCategoriaChange(cat)}
@@ -387,7 +397,7 @@ export function ProductosTableSection({
       {/* ── Contenido ── */}
       {vistaMode === "tabla" ? (
         <VistaTabla
-          productos={productos}
+          productos={cleanProductos}
           ordenCampo={ordenCampo}
           ordenDir={ordenDir}
           onToggleOrden={onToggleOrden}
@@ -396,7 +406,7 @@ export function ProductosTableSection({
           onDelete={onDelete}
         />
       ) : (
-        <VistaGrilla productos={productos} onView={onView} onEdit={onEdit} onDelete={onDelete} />
+        <VistaGrilla productos={cleanProductos} onView={onView} onEdit={onEdit} onDelete={onDelete} />
       )}
 
       {/* ── Footer ── */}
@@ -405,7 +415,7 @@ export function ProductosTableSection({
         display: "flex", justifyContent: "space-between", alignItems: "center",
       }}>
         <span style={{ fontSize: 12, color: t.textDisabled }}>
-          Mostrando {productos.length} de {totalCount} productos
+          Mostrando {cleanProductos.length} de {totalCount} productos
         </span>
         <div style={{ display: "flex", gap: 6 }}>
           {[1, 2, 3].map((n) => (

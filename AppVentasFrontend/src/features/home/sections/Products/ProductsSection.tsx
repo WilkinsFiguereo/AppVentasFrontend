@@ -21,7 +21,12 @@ export default function ProductsSection({
   return (
     <section>
       <br />
-      <SectionHeading label="Para ti" title="Productos recomendados" showAll />
+      <SectionHeading
+        label="Para ti"
+        title="Productos recomendados"
+        showAll
+        showAllHref="http://localhost:3000/navigation/search"
+      />
       <CategoryTabs active={cat} set={setCat} categories={categories} />
 
       {products.length ? (

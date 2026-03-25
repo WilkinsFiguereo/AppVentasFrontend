@@ -40,7 +40,7 @@ export default function RelatedCard({ p }: { p: RelatedProduct }) {
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Stars r={p.rating} size={11} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: T.accent, fontFamily: "'Sora',sans-serif" }}>${p.price}/mes</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: T.accent, fontFamily: "'Sora',sans-serif" }}>${p.price}</span>
         </div>
       </div>
     </div>

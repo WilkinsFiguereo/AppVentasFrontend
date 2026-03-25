@@ -11,8 +11,6 @@ export default function ProductCard({ p }: { p: Product }) {
   const router = useRouter();
 
   const [h, setH] = useState(false);
-  const [wished, setWished] = useState(false);
-  const disc = p.old ? Math.round((1 - p.price / p.old) * 100) : null;
 
   const badgeMap: Record<string, { bg: string; color: string }> = {
     "Más vendido": { bg: "#D1FAE5", color: "#065F46" },
@@ -95,41 +93,6 @@ export default function ProductCard({ p }: { p: Product }) {
           </span>
         ) : null}
 
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setWished(!wished);
-          }}
-          style={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            width: 29,
-            height: 29,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.94)",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
-            opacity: h || wished ? 1 : 0,
-            transition: "opacity .2s",
-          }}
-          aria-label={wished ? "Quitar de favoritos" : "Agregar a favoritos"}
-        >
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 14 14"
-            fill={wished ? "#EF4444" : "none"}
-            stroke={wished ? "#EF4444" : T.sub}
-            strokeWidth="1.4"
-          >
-            <path d="M7 12.5S1 8.5 1 4.7A3.5 3.5 0 017 4.7a3.5 3.5 0 016 0c0 3.8-6 7.8-6 7.8z" />
-          </svg>
-        </button>
       </div>
 
       <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
@@ -149,16 +112,9 @@ export default function ProductCard({ p }: { p: Product }) {
         <div style={{ marginTop: "auto", paddingTop: 8, display: "flex", alignItems: "baseline", gap: 7 }}>
           <span style={{ fontSize: 19, fontWeight: 700, color: T.text, letterSpacing: "-0.3px" }}>
             ${p.price}
-            <span style={{ fontSize: 11, fontWeight: 500, color: T.sub }}>/mes</span>
+            <span style={{ fontSize: 11, fontWeight: 500, color: T.sub }}></span>
           </span>
 
-          {p.old ? <span style={{ fontSize: 12, color: T.sub, textDecoration: "line-through" }}>${p.old}</span> : null}
-
-          {disc ? (
-            <span style={{ fontSize: 10, fontWeight: 700, color: T.success, background: "#D1FAE5", padding: "2px 6px", borderRadius: 5 }}>
-              -{disc}%
-            </span>
-          ) : null}
         </div>
       </div>
     </div>

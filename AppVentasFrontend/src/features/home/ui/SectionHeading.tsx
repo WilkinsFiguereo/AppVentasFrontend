@@ -5,10 +5,12 @@ export default function SectionHeading({
   label,
   title,
   showAll,
+  showAllHref = "#",
 }: {
   label: string;
   title: string;
   showAll?: boolean;
+  showAllHref?: string;
 }) {
   return (
     <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 22 }}>
@@ -20,7 +22,7 @@ export default function SectionHeading({
       </div>
 
       {showAll ? (
-        <a href="#" style={{ fontSize: 12, fontWeight: 600, color: T.accentMid, textDecoration: "none", display: "flex", alignItems: "center", gap: 3 }}>
+        <a href={showAllHref} style={{ fontSize: 12, fontWeight: 600, color: T.accentMid, textDecoration: "none", display: "flex", alignItems: "center", gap: 3 }}>
           Ver todo
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M2 6h8M6 2l4 4-4 4" stroke={T.accentMid} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />

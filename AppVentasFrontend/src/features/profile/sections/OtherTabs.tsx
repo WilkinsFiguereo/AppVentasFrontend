@@ -1,197 +1,269 @@
 "use client";
 
 import { useState } from "react";
-import { Address, NotificationPrefs, PasswordFormData } from "../types/profile.types";
-import { MOCK_ADDRESSES } from "../data/mockProfile";
+import { Address, AddressPayload } from "../api/profileApi";
 
-/* ── ADDRESSES ─────────────────────────────────────── */
-export function AddressesTab() {
-  const [addresses, setAddresses] = useState<Address[]>(MOCK_ADDRESSES);
-
-  function setDefault(id: string) {
-    setAddresses((prev) => prev.map((a) => ({ ...a, isDefault: a.id === id })));
-  }
-  function remove(id: string) {
-    setAddresses((prev) => prev.filter((a) => a.id !== id));
-  }
-
-  return (
-    <div className="section-card">
-      <div className="section-header">
-        <div>
-          <div className="section-title">Direcciones</div>
-          <div className="section-sub">Administra tus direcciones de envío</div>
-        </div>
-      </div>
-      <div className="section-body">
-        <div className="addresses-grid">
-          {addresses.map((addr) => (
-            <div key={addr.id} className={`address-card${addr.isDefault ? " default" : ""}`}>
-              <div className="address-label-row">
-                <span className="address-label">{addr.label}</span>
-                {addr.isDefault && <span className="default-badge">Principal</span>}
-              </div>
-              <div className="address-name">{addr.name}</div>
-              <div className="address-lines">
-                {addr.line1}<br />
-                {addr.line2 && <>{addr.line2}<br /></>}
-                {addr.city}, {addr.country}
-              </div>
-              <div className="address-actions">
-                <button className="btn-addr">Editar</button>
-                {!addr.isDefault && (
-                  <button className="btn-addr" onClick={() => setDefault(addr.id)}>
-                    Hacer principal
-                  </button>
-                )}
-                <button className="btn-addr danger" onClick={() => remove(addr.id)}>
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          ))}
-          <button className="btn-add-addr">+ Agregar nueva dirección</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ── SECURITY ──────────────────────────────────────── */
-interface SecurityTabProps {
+interface AddressesTabProps {
+  addresses: Address[] | null;
+  loading: boolean;
   isSaving: boolean;
-  saveSuccess: boolean;
-  onSavePassword: (data: PasswordFormData) => void;
+  saveError: string | null;
+  onAdd: (payload: AddressPayload) => Promise<void>;
+  onEdit: (id: number, payload: Partial<AddressPayload>) => Promise<void>;
+  onRemove: (id: number) => Promise<void>;
+  onSetDefault: (id: number) => Promise<void>;
 }
 
-export function SecurityTab({ isSaving, saveSuccess, onSavePassword }: SecurityTabProps) {
-  const [pwd, setPwd] = useState<PasswordFormData>({ currentPassword: "", newPassword: "", confirmPassword: "" });
+const EMPTY_FORM: AddressPayload = {
+  name: "",
+  street: "",
+  street2: "",
+  city: "",
+  zip: "",
+  label: "",
+  is_default: false,
+};
+
+export function AddressesTab({
+  addresses,
+  loading,
+  isSaving,
+  saveError,
+  onAdd,
+  onEdit,
+  onRemove,
+  onSetDefault,
+}: AddressesTabProps) {
+  const [modalOpen, setModalOpen]   = useState(false);
+  const [editTarget, setEditTarget] = useState<Address | null>(null);
+  const [form, setForm]             = useState<AddressPayload>(EMPTY_FORM);
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+
+  function openNew() {
+    setEditTarget(null);
+    setForm(EMPTY_FORM);
+    setModalOpen(true);
+  }
+
+  function openEdit(addr: Address) {
+    setEditTarget(addr);
+    setForm({
+      name:       addr.name,
+      street:     addr.line1,
+      street2:    addr.line2,
+      city:       addr.city,
+      zip:        addr.zip,
+      label:      addr.label,
+      is_default: addr.is_default,
+    });
+    setModalOpen(true);
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setPwd((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value, type, checked } = e.target;
+    setForm((p) => ({ ...p, [name]: type === "checkbox" ? checked : value }));
   }
 
+  async function handleSubmit() {
+    if (editTarget) {
+      await onEdit(editTarget.id, form);
+    } else {
+      await onAdd(form);
+    }
+    if (!saveError) setModalOpen(false);
+  }
+
+  async function handleDelete(id: number) {
+    await onRemove(id);
+    setDeleteConfirm(null);
+  }
+
+  const list = addresses ?? [];
+
   return (
-    <div className="section-card">
-      <div className="section-header">
-        <div>
-          <div className="section-title">Seguridad</div>
-          <div className="section-sub">Controla el acceso y la seguridad de tu cuenta</div>
-        </div>
-      </div>
-      <div className="section-body">
-        {saveSuccess && <div className="success-banner">✅ Contraseña actualizada correctamente</div>}
-
-        <div className="security-item">
-          <div className="security-left">
-            <div className="security-icon si-blue">🔑</div>
-            <div>
-              <div className="security-label">Contraseña</div>
-              <div className="security-desc">Última actualización hace 3 meses</div>
-            </div>
+    <>
+      <div className="section-card">
+        <div className="section-header">
+          <div>
+            <p className="section-title">Direcciones</p>
+            <p className="section-sub">Administra tus direcciones de envío</p>
           </div>
         </div>
 
-        <div className="security-item">
-          <div className="security-left">
-            <div className="security-icon si-green">📱</div>
-            <div>
-              <div className="security-label">Autenticación de dos factores</div>
-              <div className="security-desc">Protege tu cuenta con un código adicional</div>
-            </div>
-          </div>
-          <span className="security-tag tag-inactive">No activado</span>
-        </div>
+        <div className="section-body">
+          {saveError && <div className="error-banner">⚠️ {saveError}</div>}
 
-        <div className="security-item">
-          <div className="security-left">
-            <div className="security-icon si-blue">🌐</div>
-            <div>
-              <div className="security-label">Sesiones activas</div>
-              <div className="security-desc">2 dispositivos conectados actualmente</div>
+          {loading && list.length === 0 && (
+            <div className="addresses-grid">
+              {[1, 2].map((i) => (
+                <div key={i} className="address-card">
+                  <div className="skeleton skeleton-label" />
+                  <div className="skeleton skeleton-input" />
+                  <div className="skeleton skeleton-sub" />
+                </div>
+              ))}
             </div>
-          </div>
-          <button className="btn-security">Ver sesiones</button>
-        </div>
+          )}
 
-        {/* Password form */}
-        <div className="pwd-form">
-          <div className="pwd-form-title">Cambiar contraseña</div>
-          <div className="form-grid">
-            <div className="field span2">
-              <label htmlFor="currentPassword">Contraseña actual</label>
-              <input id="currentPassword" name="currentPassword" type="password" placeholder="••••••••" value={pwd.currentPassword} onChange={handleChange} />
-            </div>
-            <div className="field">
-              <label htmlFor="newPassword">Nueva contraseña</label>
-              <input id="newPassword" name="newPassword" type="password" placeholder="Mín. 8 caracteres" value={pwd.newPassword} onChange={handleChange} />
-            </div>
-            <div className="field">
-              <label htmlFor="confirmPassword">Confirmar contraseña</label>
-              <input id="confirmPassword" name="confirmPassword" type="password" placeholder="••••••••" value={pwd.confirmPassword} onChange={handleChange} />
-            </div>
-          </div>
-          <div className="form-actions">
-            <button className="btn-cancel">Cancelar</button>
-            <button className="btn-save" disabled={isSaving} onClick={() => onSavePassword(pwd)}>
-              {isSaving ? "Actualizando…" : "Actualizar contraseña"}
+          <div className="addresses-grid">
+            {list.map((addr) => (
+              <div key={addr.id} className={`address-card${addr.is_default ? " default" : ""}`}>
+                <div className="address-label-row">
+                  <span className="address-label">{addr.label}</span>
+                  {addr.is_default && <span className="default-badge">Principal</span>}
+                </div>
+                <div className="address-name">{addr.name}</div>
+                <div className="address-lines">
+                  {addr.line1}
+                  {addr.line2 && <><br />{addr.line2}</>}
+                  <br />
+                  {addr.city}{addr.zip ? ` ${addr.zip}` : ""}, {addr.country}
+                </div>
+                <div className="address-actions">
+                  <button className="btn-addr" onClick={() => openEdit(addr)}>
+                    Editar
+                  </button>
+                  {!addr.is_default && (
+                    <button className="btn-addr" onClick={() => onSetDefault(addr.id)}>
+                      Hacer principal
+                    </button>
+                  )}
+                  {deleteConfirm === addr.id ? (
+                    <>
+                      <span className="delete-confirm-text">¿Eliminar?</span>
+                      <button className="btn-addr danger" onClick={() => handleDelete(addr.id)}>
+                        Sí
+                      </button>
+                      <button className="btn-addr" onClick={() => setDeleteConfirm(null)}>
+                        No
+                      </button>
+                    </>
+                  ) : (
+                    <button className="btn-addr danger" onClick={() => setDeleteConfirm(addr.id)}>
+                      Eliminar
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            <button className="btn-add-addr" onClick={openNew}>
+              + Agregar nueva dirección
             </button>
           </div>
         </div>
-
-        {/* Danger zone */}
-        <p className="section-divider">Zona de peligro</p>
-        <div className="danger-zone">
-          <div>
-            <div className="danger-title">Eliminar cuenta</div>
-            <div className="danger-desc">Esta acción es permanente e irreversible. Se borrarán todos tus datos.</div>
-          </div>
-          <button className="btn-danger">Eliminar mi cuenta</button>
-        </div>
       </div>
-    </div>
-  );
-}
 
-/* ── NOTIFICATIONS ─────────────────────────────────── */
-interface NotificationsTabProps {
-  prefs: NotificationPrefs;
-  onToggle: (key: keyof NotificationPrefs) => void;
-}
-
-const NOTIF_CONFIG: { key: keyof NotificationPrefs; label: string; desc: string }[] = [
-  { key: "orders",        label: "Actualizaciones de pedidos",  desc: "Recibe alertas cuando tu pedido cambie de estado, sea enviado o entregado." },
-  { key: "promotions",    label: "Ofertas y promociones",       desc: "Descuentos exclusivos, ofertas flash y productos destacados." },
-  { key: "security",      label: "Alertas de seguridad",        desc: "Notificaciones sobre inicios de sesión y cambios en tu cuenta." },
-  { key: "newsletter",    label: "Newsletter semanal",          desc: "Resumen semanal con novedades, tendencias y contenido de valor." },
-];
-
-export function NotificationsTab({ prefs, onToggle }: NotificationsTabProps) {
-  return (
-    <div className="section-card">
-      <div className="section-header">
-        <div>
-          <div className="section-title">Notificaciones</div>
-          <div className="section-sub">Elige qué comunicaciones deseas recibir</div>
-        </div>
-      </div>
-      <div className="section-body">
-        {NOTIF_CONFIG.map((item) => (
-          <div key={item.key} className="notif-item">
-            <div className="notif-info">
-              <div className="notif-label">{item.label}</div>
-              <div className="notif-desc">{item.desc}</div>
+      {/* ── Address Modal ── */}
+      {modalOpen && (
+        <div className="modal-overlay" onClick={() => setModalOpen(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <span className="modal-title">
+                {editTarget ? "Editar dirección" : "Nueva dirección"}
+              </span>
+              <button className="modal-close" onClick={() => setModalOpen(false)}>✕</button>
             </div>
-            <button
-              role="switch"
-              aria-checked={prefs[item.key]}
-              className={`toggle ${prefs[item.key] ? "on" : "off"}`}
-              onClick={() => onToggle(item.key)}
-              aria-label={item.label}
-            />
+
+            {saveError && <div className="error-banner">⚠️ {saveError}</div>}
+
+            <div className="form-grid">
+              <div className="field span2">
+                <label htmlFor="addr-label">Etiqueta</label>
+                <input
+                  id="addr-label"
+                  name="label"
+                  value={form.label ?? ""}
+                  onChange={handleChange}
+                  placeholder="Ej: 🏢 Oficina"
+                />
+              </div>
+
+              <div className="field span2">
+                <label htmlFor="addr-name">Nombre del destinatario</label>
+                <input
+                  id="addr-name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Nombre completo"
+                />
+              </div>
+
+              <div className="field span2">
+                <label htmlFor="addr-street">Dirección línea 1 *</label>
+                <input
+                  id="addr-street"
+                  name="street"
+                  value={form.street}
+                  onChange={handleChange}
+                  placeholder="Calle y número"
+                />
+              </div>
+
+              <div className="field span2">
+                <label htmlFor="addr-street2">
+                  Dirección línea 2 <span className="label-opt">(opcional)</span>
+                </label>
+                <input
+                  id="addr-street2"
+                  name="street2"
+                  value={form.street2 ?? ""}
+                  onChange={handleChange}
+                  placeholder="Apto, piso, suite…"
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="addr-city">Ciudad</label>
+                <input
+                  id="addr-city"
+                  name="city"
+                  value={form.city ?? ""}
+                  onChange={handleChange}
+                  placeholder="Ciudad"
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="addr-zip">Código postal</label>
+                <input
+                  id="addr-zip"
+                  name="zip"
+                  value={form.zip ?? ""}
+                  onChange={handleChange}
+                  placeholder="00000"
+                />
+              </div>
+
+              <div className="field span2">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="is_default"
+                    checked={form.is_default ?? false}
+                    onChange={handleChange}
+                  />
+                  Establecer como dirección principal
+                </label>
+              </div>
+            </div>
+
+            <div className="form-actions">
+              <button className="btn-cancel" onClick={() => setModalOpen(false)}>
+                Cancelar
+              </button>
+              <button className="btn-save" disabled={isSaving || !form.street || !form.name} onClick={handleSubmit}>
+                {isSaving ? (
+                  <><span className="btn-spinner" /> Guardando…</>
+                ) : (
+                  editTarget ? "Guardar cambios" : "Agregar dirección"
+                )}
+              </button>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -185,7 +185,7 @@ export function ProductCard({ product, isHighlighted = false }: ProductCardProps
             }}
           >
             ${product.price}
-            <span style={{ fontSize: 12, fontWeight: 500, color: tokens.sub }}>/mes</span>
+            <span style={{ fontSize: 12, fontWeight: 500, color: tokens.sub }}></span>
           </span>
           {product.oldPrice && (
             <>

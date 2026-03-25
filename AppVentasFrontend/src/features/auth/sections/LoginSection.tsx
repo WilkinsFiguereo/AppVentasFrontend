@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useLogin } from "../hooks/useLogin";
 import { AuthCard } from "../ui/AuthCard";
 import { InputField, SubmitButton, ErrorBanner, RememberRow } from "../ui/AuthFields";
@@ -29,6 +30,7 @@ const LOGIN_BRANDING = {
 };
 
 export function LoginSection() {
+  const router = useRouter();
   const { form, errors, authState, handleChange, handleSubmit } = useLogin();
 
   function handleGoogleLogin() {
@@ -80,6 +82,13 @@ export function LoginSection() {
         />
 
         <SubmitButton label="Iniciar sesión" isLoading={authState.isLoading} />
+        <button
+          type="button"
+          className="auth-btn-secondary"
+          onClick={() => router.push("/navigation/home")}
+        >
+          Volver al inicio
+        </button>
       </form>
     </AuthCard>
   );

@@ -104,7 +104,7 @@ export function DealCard({ deal, onAddToCart }: DealCardProps) {
         <div className="deal-prices">
           <span className="deal-price">
             ${deal.price.toLocaleString("es-DO", { minimumFractionDigits: 2 })}
-            {isService && <span className="deal-period">/mes</span>}
+            {isService && <span className="deal-period"></span>}
           </span>
           <span className="deal-original">${deal.originalPrice.toLocaleString("es-DO", { minimumFractionDigits: 2 })}</span>
         </div>

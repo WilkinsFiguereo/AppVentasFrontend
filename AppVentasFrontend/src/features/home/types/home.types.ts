@@ -15,7 +15,6 @@ export type Product = {
   cat: string;
   img: string;
   price: number;
-  old: number | null;
   rating: number;
   reviews: number;
   badge: string | null;

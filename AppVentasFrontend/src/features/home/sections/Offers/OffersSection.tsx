@@ -99,7 +99,7 @@ function OfferCard({ p }: { p: Product }) {
         <div style={{ marginTop: "auto", paddingTop: 6, display: "flex", alignItems: "baseline", gap: 8 }}>
           <span style={{ fontSize: 20, fontWeight: 900, color: T.text, letterSpacing: "-0.3px" }}>
             ${p.price}
-            <span style={{ fontSize: 11, fontWeight: 600, color: T.sub }}>/mes</span>
+            <span style={{ fontSize: 11, fontWeight: 600, color: T.sub }}></span>
           </span>
 
           {p.old ? <span style={{ fontSize: 12, color: T.sub, textDecoration: "line-through" }}>${p.old}</span> : null}
@@ -135,7 +135,12 @@ export default function OffersSection({ products }: { products: Product[] }) {
   return (
     <section>
         <br/>
-      <SectionHeading label="Ahorra" title="Ofertas destacadas" showAll />
+      <SectionHeading
+        label="Ahorra"
+        title="Ofertas destacadas"
+        showAll
+        showAllHref="http://localhost:3000/navigation/search"
+      />
 
       <div
         style={{

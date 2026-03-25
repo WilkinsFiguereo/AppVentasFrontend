@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { fetchSlidesFromApi, SLIDES } from "../../data/slides";
+import { getSlides, SLIDES_FALLBACK } from "../../data/slides";
 import { T } from "../../theme/tokens";
 import type { Slide } from "../../types/home.types";
 import Button from "../../ui/Button";
@@ -46,31 +46,25 @@ function Arrow({ dir, onClick }: { dir: "left" | "right"; onClick: () => void })
 }
 
 export default function HeroSlider() {
-  const [slides, setSlides] = useState<Slide[]>(SLIDES);
+  // ✅ usar fallback correctamente
+  const [slides, setSlides] = useState<Slide[]>(SLIDES_FALLBACK);
+
   const [cur, setCur] = useState(0);
   const [tx, setTx] = useState("0px");
   const [op, setOp] = useState(1);
   const [paused, setPaused] = useState(false);
   const lockRef = useRef(false);
 
+  // ✅ cargar dinámico desde API
   useEffect(() => {
     let cancelled = false;
 
-    const loadSlides = async () => {
-      try {
-        const apiSlides = await fetchSlidesFromApi(10);
-        if (!cancelled && apiSlides.length > 0) {
-          setSlides(apiSlides);
-          setCur(0);
-        }
-      } catch {
-        if (!cancelled) {
-          setSlides(SLIDES);
-        }
+    getSlides().then((data) => {
+      if (!cancelled) {
+        setSlides(data);
+        setCur(0);
       }
-    };
-
-    loadSlides();
+    });
 
     return () => {
       cancelled = true;
@@ -113,7 +107,8 @@ export default function HeroSlider() {
     return () => clearInterval(id);
   }, [paused, next, slideCount]);
 
-  const s = slides[cur] || SLIDES[0];
+  // ✅ usar fallback correctamente
+  const s = slides[cur] || SLIDES_FALLBACK[0];
 
   return (
     <div
@@ -177,7 +172,9 @@ export default function HeroSlider() {
             {s.title}
           </h1>
 
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.62)", lineHeight: 1.72, marginBottom: 26, maxWidth: 400 }}>{s.body}</p>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.62)", lineHeight: 1.72, marginBottom: 26, maxWidth: 400 }}>
+            {s.body}
+          </p>
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Button variant="white">{s.cta}</Button>
@@ -186,12 +183,12 @@ export default function HeroSlider() {
         </div>
       </div>
 
-      {slideCount > 1 ? (
+      {slideCount > 1 && (
         <>
           <Arrow dir="left" onClick={back} />
           <Arrow dir="right" onClick={next} />
 
-          <div style={{ position: "absolute", bottom: 20, right: 24, display: "flex", gap: 5, alignItems: "center" }}>
+          <div style={{ position: "absolute", bottom: 20, right: 24, display: "flex", gap: 5 }}>
             {slides.map((slide, i) => (
               <button
                 key={slide.id}
@@ -202,19 +199,13 @@ export default function HeroSlider() {
                   borderRadius: 3,
                   border: "none",
                   cursor: "pointer",
-                  padding: 0,
                   background: i === cur ? "#fff" : "rgba(255,255,255,0.3)",
-                  transition: "all .3s ease",
                 }}
               />
             ))}
           </div>
         </>
-      ) : null}
-
-      <div style={{ position: "absolute", bottom: 24, left: "clamp(24px,4.5vw,52px)", fontSize: 10, color: "rgba(255,255,255,0.35)", fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace", letterSpacing: "1px" }}>
-        {String(cur + 1).padStart(2, "0")} / {String(slideCount).padStart(2, "0")}
-      </div>
+      )}
     </div>
   );
 }

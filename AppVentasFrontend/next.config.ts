@@ -1,7 +1,15 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  async rewrites() {
+    const ODOO = (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8009').replace(/\/$/, '')
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+    return [
+      {
+        source:      '/odoo/:path*',
+        destination: `${ODOO}/:path*`,
+      },
+    ]
+  },
+}
 
-export default nextConfig;
+module.exports = nextConfig

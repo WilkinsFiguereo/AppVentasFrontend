@@ -1,22 +1,22 @@
-﻿// app/src/features/product-detail/ProductDetailPage.tsx
+﻿// app/src/features/product-detail/ProductDetailPage.tsx  (diff: líneas cambiadas marcadas con ◄)
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 
-import Navbar from "./components/Navbar";
+import Navbar from "../home/sections/Navbar/Navbar";    // ◄ sin cambio de import
 import Gallery from "./components/Gallery";
 import PurchasePanel from "./components/PurchasePanel";
 
 import ProductHeader from "./sections/ProductHeader";
 import FeaturesSection from "./sections/FeaturesSection";
 import SpecsSection from "./sections/SpecsSection";
-import ReviewsSection from "./sections/ReviewsSection";
+import ReviewsSection from "./sections/ReviewsSection";    // ◄ sin cambio de import
 import RelatedSection from "./sections/RelatedSection";
 
 import Divider from "./ui/Divider";
 import { T } from "./theme/tokens";
 
-import { REVIEWS_DATA } from "./data/reviews.mock";
+// ◄ ELIMINADO: import { REVIEWS_DATA } from "./data/reviews.mock";
 import type { ProductDetail, RelatedProduct } from "./types/product-detail.types";
 import { CART_UPDATED_EVENT, getCartItems } from "../cart/data/cartStorage";
 
@@ -87,8 +87,8 @@ function mapToProductDetail(item: ApiProductItem): ProductDetail {
     tagline,
     category,
     badge: price < oldPrice ? "Oferta" : "Destacado",
-    rating: 4.7,
-    totalReviews: 128,
+    rating: 0,           // ◄ se reemplaza con dato real desde ReviewsSection
+    totalReviews: 0,     // ◄ idem
     price,
     oldPrice,
     annualPrice,
@@ -102,7 +102,7 @@ function mapToProductDetail(item: ApiProductItem): ProductDetail {
       { label: "Precio referencia", value: `$${oldPrice}` },
       { label: "Origen", value: "Odoo" },
     ],
-    ratingBreakdown: { 5: 80, 4: 30, 3: 10, 2: 5, 1: 3 },
+    ratingBreakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }, // ◄ manejado por ReviewsSection
   };
 }
 
@@ -117,12 +117,20 @@ function mapToRelated(item: ApiProductItem): RelatedProduct {
   };
 }
 
+const SESSION_KEYS = ["access_token", "auth_token", "token", "refresh_token"];
+
+function hasSessionToken() {
+  if (typeof window === "undefined") return false;
+  return SESSION_KEYS.some((key) => Boolean(localStorage.getItem(key)));
+}
+
 export default function ProductDetailPage({ productId }: { productId: number | null }) {
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [related, setRelated] = useState<RelatedProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cartCount, setCartCount] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => hasSessionToken());
 
   useEffect(() => {
     setCartCount(getCartCount());
@@ -138,8 +146,14 @@ export default function ProductDetailPage({ productId }: { productId: number | n
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
+    const syncSession = () => setIsLoggedIn(hasSessionToken());
+    window.addEventListener("storage", syncSession);
+    return () => window.removeEventListener("storage", syncSession);
+  }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    
     const load = async () => {
       if (!productId) {
         setError("ID de producto invalido");
@@ -217,16 +231,17 @@ export default function ProductDetailPage({ productId }: { productId: number | n
           <Divider />
           <SpecsSection specs={product.specs} />
           <Divider />
-          <ReviewsSection p={product} reviews={REVIEWS_DATA} />
+          {/* ◄ productId en lugar de p+reviews mock */}
+          <ReviewsSection productId={product.id} isLoggedIn={isLoggedIn} />
         </div>
 
         <div>
-          <PurchasePanel product={product} />
+          <PurchasePanel product={product} isLoggedIn={isLoggedIn} />
           <RelatedSection related={related} />
         </div>
       </div>
     );
-  }, [loading, product, error, related]);
+  }, [loading, product, error, related, isLoggedIn]);
 
   return (
     <>
@@ -238,8 +253,7 @@ export default function ProductDetailPage({ productId }: { productId: number | n
         ::-webkit-scrollbar-thumb { background:${T.border}; border-radius:3px; }
       `}</style>
 
-      <Navbar saved={1} cart={cartCount} category={product?.category} productName={product?.name} />
-
+      <Navbar cart={cartCount} />
       <main style={{ maxWidth: 1200, margin: "0 auto", padding: "36px 32px 64px" }}>{content}</main>
     </>
   );
