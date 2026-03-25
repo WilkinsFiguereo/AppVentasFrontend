@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LoginFormData, AuthState } from "../types/auth.types";
-import { LOGIN_INITIAL_VALUES, ERROR_MESSAGES, AUTH_ROUTES, AUTH_API, TOKEN_KEYS } from "../data/constants";
+import {
+  LOGIN_INITIAL_VALUES,
+  ERROR_MESSAGES,
+  AUTH_ROUTES,
+  AUTH_API,
+  TOKEN_KEYS,
+  ADMIN_REDIRECT,
+} from "../data/constants";
 
 type AuthApiResponse = {
   success?: boolean;
@@ -70,13 +77,16 @@ export function useLogin() {
     setAuthState({ isLoading: true, error: null, success: false });
 
     try {
+      const normalizedEmail = form.email.trim().toLowerCase();
+      const isAdminLogin = normalizedEmail === ADMIN_REDIRECT.email.toLowerCase();
+
       const response = await fetch(`${AUTH_API.baseUrl}${AUTH_API.loginPath}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: form.email.trim().toLowerCase(),
+          email: normalizedEmail,
           password: form.password,
         }),
       });
@@ -90,6 +100,11 @@ export function useLogin() {
       persistSession(payload.data);
 
       setAuthState({ isLoading: false, error: null, success: true });
+      if (isAdminLogin && typeof window !== "undefined") {
+        window.location.assign(ADMIN_REDIRECT.destination);
+        return;
+      }
+
       router.push(AUTH_ROUTES.dashboard);
     } catch (error) {
       setAuthState({

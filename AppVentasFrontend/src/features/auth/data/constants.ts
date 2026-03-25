@@ -1,8 +1,13 @@
-﻿export const AUTH_ROUTES = {
+export const AUTH_ROUTES = {
   login: "/navigation/auth/login",
   register: "/navigation/auth/register",
   dashboard: "/navigation/home",
   forgotPassword: "/navigation/auth/forgot-password",
+};
+
+export const ADMIN_REDIRECT = {
+  email: "admin@admin.com",
+  destination: "http://localhost:3004/navigation/seller/dashboard/page",
 };
 
 export const AUTH_API = {
