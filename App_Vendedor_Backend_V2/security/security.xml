@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Partner Group -->
+    <record id="group_app_partner" model="res.groups">
+        <field name="name">App Partner</field>
+        <field name="comment">Users registered from the mobile app as partners</field>
+    </record>
+
+    <!-- Delivery Group -->
+    <record id="group_app_delivery" model="res.groups">
+        <field name="name">App Delivery</field>
+        <field name="comment">Delivery users created from Odoo backend</field>
+    </record>
+
+    <!-- JWT Token Model Access Rules -->
+    <record id="access_jwt_token_user" model="ir.model.access">
+        <field name="name">JWT Token User Access</field>
+        <field name="model_id" ref="model_jwt_token"/>
+        <field name="group_id" ref="base.group_user"/>
+        <field name="perm_read">1</field>
+        <field name="perm_write">1</field>
+        <field name="perm_create">1</field>
+        <field name="perm_unlink">1</field>
+    </record>
+
+    <record id="access_jwt_token_public" model="ir.model.access">
+        <field name="name">JWT Token Public Access</field>
+        <field name="model_id" ref="model_jwt_token"/>
+        <field name="group_id" ref="base.group_public"/>
+        <field name="perm_read">0</field>
+        <field name="perm_write">0</field>
+        <field name="perm_create">1</field>
+        <field name="perm_unlink">0</field>
+    </record>
+
+</odoo>

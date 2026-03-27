@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- JWT Configuration Parameters -->
+    <record id="jwt_secret_key" model="ir.config_parameter">
+        <field name="key">jwt.secret_key</field>
+        <field name="value">your-super-secret-key-change-this-in-production-2024</field>
+    </record>
+
+    <record id="jwt_access_token_expiry" model="ir.config_parameter">
+        <field name="key">jwt.access_token_expiry</field>
+        <field name="value">3600</field> <!-- 1 hour in seconds -->
+    </record>
+
+    <record id="jwt_refresh_token_expiry" model="ir.config_parameter">
+        <field name="key">jwt.refresh_token_expiry</field>
+        <field name="value">2592000</field> <!-- 30 days in seconds -->
+    </record>
+
+    <record id="jwt_algorithm" model="ir.config_parameter">
+        <field name="key">jwt.algorithm</field>
+        <field name="value">HS256</field>
+    </record>
+</odoo>

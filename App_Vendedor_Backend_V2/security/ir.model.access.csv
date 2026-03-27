@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_jwt_token_partner,JWT Token Partner,model_jwt_token,group_app_partner,1,1,1,1
+access_jwt_token_delivery,JWT Token Delivery,model_jwt_token,group_app_delivery,1,1,1,1
